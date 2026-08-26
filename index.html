@@ -172,6 +172,15 @@
           <option value="8">+8%</option>
         </select>
       </div>
+      <div>
+        <label for="cascadeIntensitySelect">Cat B&rarr;Cat A cascade sliding</label>
+        <select id="cascadeIntensitySelect" onchange="render()">
+          <option value="0.25">25% slide</option>
+          <option value="0.5">50% slide</option>
+          <option value="0.75">75% slide</option>
+          <option value="1" selected>100% slide (current)</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -494,12 +503,21 @@
 
     <h3>"With seat increase" (optimistic view) &mdash; two layers on top of Step 2</h3>
     <ul>
-      <li><strong>Layer A &mdash; this college's own seat growth.</strong> Apollo's seats grew 44&rarr;45 (just 1 seat) &mdash; barely moves anything, about 48 rank-positions of easing.</li>
+      <li><strong>Layer A &mdash; this college's own seat growth.</strong> Apollo's seats grew 44&rarr;45 (just 1 seat) &mdash; barely moves anything, about 48 rank-positions of easing. This is a verified fact from the seat matrix, so it always applies at its real value and is <strong>not</strong> affected by the cascade dropdown below.</li>
       <li><strong>Layer B &mdash; the government college "domino effect."</strong> 4 government colleges added ~41 new seats this year.</li>
       <li>Some students who'd have taken a paid Management Quota seat instead get one of these new government seats &mdash; one fewer real competitor for private colleges.</li>
-      <li>Traced through, this reaches Apollo specifically, adding up to <strong>1,747</strong> rank-positions of easing (before the loyalty dampening below reduces it) &mdash; far bigger than Apollo's own seat growth.</li>
-      <li>&rarr; Apollo "With" (after dampening) = <strong>436 / 421 / 420</strong>, still below "Without" (445/428/427), but less optimistic than an undampened cascade would suggest.</li>
+      <li>Traced through, this reaches Apollo specifically, adding up to <strong>1,747</strong> rank-positions of easing at full (100%) intensity, before the loyalty dampening below reduces it further &mdash; far bigger than Apollo's own seat growth.</li>
+      <li>&rarr; Apollo "With" at default settings (100% slide, +4% MQ) = <strong>438 / 423 / 422</strong>, still below "Without" (445/428/427).</li>
       <li><strong>Honest caveat:</strong> this domino chain is the most speculative part of the model &mdash; it assumes displaced students pick "the next best option" in a predictable order, which we can't independently verify. Colored badges on each college show how confident we are; "high confidence" means "most defensible link in the chain," not "certain."</li>
+    </ul>
+
+    <h3>Cat B&rarr;Cat A cascade sliding dropdown</h3>
+    <ul>
+      <li>Controls how much of <strong>Layer B only</strong> (the government domino effect) to apply &mdash; 25%, 50%, or the full 100% currently modeled.</li>
+      <li><strong>Layer A is never affected by this dropdown</strong> &mdash; a college's own real seat growth always applies at its true, measured value, since it's a fact, not an assumption.</li>
+      <li>Lower settings are for anyone who wants to trust the domino chain less &mdash; e.g., 25% assumes only a quarter of the displaced-candidate chain actually plays out as modeled.</li>
+      <li>100% (the current default when "With seat increase" is on) matches everything described above with no discount applied.</li>
+      <li>This dropdown has no effect at all when "Seats increase" is set to "Without," since Layer B only exists in the "With" scenario.</li>
     </ul>
 
     <h3>Loyalty/"sticky demand" dampening (top Hyderabad colleges)</h3>
@@ -1991,7 +2009,7 @@ function candidatesAboveThresholdRefined(segments, thresholdScore) {
   return total;
 }
 
-function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
+function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIntensity) {
   // Cascade ORDER (who displaces whom) is fixed at the baseline (no MQ shift) -
   // it reflects structural college preference, not a hypothetical scenario. Only
   // the MAGNITUDE of each step changes with mqShift, not the sequence itself.
@@ -2005,6 +2023,10 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
   orderBasis.sort((a, b) => b.gScore0 - a.gScore0);
   const orderedColleges = orderBasis.map(w => w.c);
 
+  // gSno already includes Layer A (this college's own real seat growth, from
+  // growthSno) - that part is a verified fact and is NEVER scaled by
+  // cascadeIntensity below. Only Layer B (the government cascade / domino
+  // effect, added afterward) responds to this dropdown.
   const withGrowth = orderedColleges.map(c => {
     const gSno = growthSno(c, applyGrowth, applyMinorityWomen, mqShift);
     return { c, gSno, gScore: scoreAtPercentileRemaining(Math.round(gSno)) };
@@ -2016,6 +2038,7 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
     return result;
   }
 
+  const intensity = cascadeIntensity != null ? cascadeIntensity : 1;
   const apollo = withGrowth[0];
   // Sticky-demand dampening: real 2025 data shows a meaningful share of a
   // college's own Cat B joiners could have gotten SOME Cat A seat statewide
@@ -2024,8 +2047,10 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
   // becoming available, so the cascade's effect on each college is scaled by
   // (1 - stickyFraction). Verified against real data: Apollo 59% sticky,
   // Kamineni LB Nagar 9%, Mamata Bachupally 11%, all other 20 colleges 0%
-  // (their Cat B joiners have no real Cat A alternative at all).
-  const apolloDampened = APOLLO_GOVT_CASCADE_SNO * (1 - (apollo.c.stickyFraction || 0));
+  // (their Cat B joiners have no real Cat A alternative at all). The
+  // cascadeIntensity dropdown is a SEPARATE, user-controlled scale on top of
+  // this - both apply multiplicatively to Layer B only.
+  const apolloDampened = APOLLO_GOVT_CASCADE_SNO * (1 - (apollo.c.stickyFraction || 0)) * intensity;
   const apolloCascadeSno = apollo.gSno + apolloDampened;
   result[apollo.c.name] = { sno: apolloCascadeSno, hop: 0, confidence: "high" };
 
@@ -2036,7 +2061,7 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
     const ceiling = scoreAtPercentileRemaining(c.opening_sno);
     if (ceiling > currentThreshold) {
       const displacedRaw = candidatesAboveThresholdRefined(c.segments, currentThreshold);
-      const displaced = Math.round(displacedRaw * (1 - (c.stickyFraction || 0)));
+      const displaced = Math.round(displacedRaw * (1 - (c.stickyFraction || 0)) * intensity);
       const density = localDensity(c);
       const extension = density > 0 ? displaced / density : 0;
       const newSno = gSno + extension;
@@ -2080,8 +2105,9 @@ function render() {
   const applyGrowth = document.getElementById("seatIncreaseSelect").value === "with";
   const applyMinorityWomen = document.getElementById("minorityWomenSelect").value === "with";
   const mqShift = parseFloat(document.getElementById("mqShiftSelect").value);
+  const cascadeIntensity = parseFloat(document.getElementById("cascadeIntensitySelect").value);
 
-  const cascade = computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift);
+  const cascade = computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIntensity);
   const computed = colleges.map(c => computeCollege(c, applyGrowth, cascade));
 
   const displayOrder = [...computed].sort((a, b) => {
@@ -2136,6 +2162,7 @@ function render() {
 document.getElementById("seatIncreaseSelect").addEventListener("change", render);
 document.getElementById("minorityWomenSelect").addEventListener("change", render);
 document.getElementById("mqShiftSelect").addEventListener("change", render);
+document.getElementById("cascadeIntensitySelect").addEventListener("change", render);
 document.getElementById("scoreInput").addEventListener("input", render);
 render();
 </script>
