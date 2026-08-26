@@ -1,0 +1,2143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cat A & Cat B 2026 Feasibility — Refined Competing Pool</title>
+<style>
+  :root {
+    --ink: #1c1c1c; --muted: #6b6b6b; --line: #e2e2e2;
+    --vsafe-bg: #d9f2df; --vsafe-text: #1a6b34;
+    --safe-bg: #eaf6ec; --safe-text: #2c7a43;
+    --border-bg: #fdf6e3; --border-text: #8a6d00;
+    --vrisky-bg: #fbeceb; --vrisky-text: #a33a34;
+    --cata-header-bg: #dbe6fb; --cata-header-text: #1e3a7a;
+    --catb-header-bg: #fce8d6; --catb-header-text: #8a4a12;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink); background: #fafaf8; margin: 0; padding: 22px 20px 80px; line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; margin: 0; max-width: 680px; }
+  .header-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 18px;
+  }
+  .header-left { flex: 1 1 380px; min-width: 260px; }
+
+  .controls {
+    display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 20px;
+  }
+  .controls label { font-weight: 600; font-size: 0.85rem; color: var(--ink); display: block; margin-bottom: 4px; }
+  .controls select, .controls input {
+    font-family: inherit; font-size: 0.95rem; font-weight: 600;
+    padding: 7px 12px; border-radius: 8px; border: 1px solid #cfcfc9; color: var(--ink);
+  }
+  .controls select {
+    padding-right: 32px;
+    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z" fill="%236b6b6b"/></svg>') no-repeat right 12px center;
+    appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer;
+  }
+  .controls input[type=number] { width: 110px; font-variant-numeric: tabular-nums; }
+  .controls select:focus, .controls input:focus { outline: 2px solid #1c1c1c; outline-offset: 2px; }
+
+  .refined-note {
+    background: #eef2fb; border: 1px solid #c9d6f2; border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 18px; font-size: 0.86rem; color: #1e3a7a;
+  }
+  .refined-note h3 { font-size: 0.86rem; margin: 0 0 6px; }
+  .refined-note ul { margin: 0; padding-left: 20px; }
+  .refined-note li { margin-bottom: 4px; }
+
+  table {
+    width: 100%; border-collapse: collapse; background: #fff;
+    border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 0.84rem;
+  }
+  thead th {
+    text-align: left; padding: 8px 8px; font-weight: 600;
+    font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--line);
+  }
+  thead th.num, tbody td.num { text-align: right; }
+  thead tr.group th { font-size: 0.72rem; padding: 7px 8px; }
+  thead tr.group th.cata { background: var(--cata-header-bg); color: var(--cata-header-text); }
+  thead tr.group th.catb { background: var(--catb-header-bg); color: var(--catb-header-text); }
+  thead tr.sub th.cata-sub { background: #eef2fc; color: var(--cata-header-text); }
+  thead tr.sub th.catb-sub { background: #fdf1e6; color: var(--catb-header-text); }
+  thead tr.sub th.college-col { background: #f3f2ee; color: var(--muted); }
+  tbody td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fbfbf9; }
+  .college { font-weight: 600; }
+  .rank-num { color: var(--muted); font-weight: 400; margin-right: 6px; }
+  .verdict {
+    display: inline-block; padding: 4px 10px; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+  }
+  .v-vsafe  { background: var(--vsafe-bg);  color: var(--vsafe-text); }
+  .v-safe   { background: var(--safe-bg);   color: var(--safe-text); }
+  .v-border { background: var(--border-bg); color: var(--border-text); }
+  .v-vrisky { background: var(--vrisky-bg); color: var(--vrisky-text); }
+  .v-neutral{ background: #f0f0ee; color: var(--muted); }
+  .cata-cell { color: var(--cata-header-text); }
+  .catb-cell { color: var(--catb-header-text); }
+  .phase-clear {
+    font-weight: 800; color: #1a6b34; background: #d9f2df;
+    border-radius: 4px; padding: 2px 5px;
+  }
+  .crowding-note {
+    display: block; font-size: 0.62rem; font-weight: 400; color: var(--muted);
+    margin-top: 1px;
+  }
+  .relief-badge {
+    display: inline-block; margin-left: 6px; padding: 2px 7px; border-radius: 999px;
+    font-size: 0.64rem; font-weight: 700; vertical-align: middle;
+  }
+  .badge-high     { background: #d9f2df; color: #1a6b34; }
+  .badge-medium   { background: #eef2fb; color: #2b4a9b; }
+  .badge-low      { background: #fdf1e6; color: #a15a1f; }
+  .badge-verylow  { background: #f0f0ee; color: #6b6b6b; }
+
+  .summary-line { margin: 14px 2px 0; font-size: 0.85rem; color: var(--muted); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 2px 0; }
+
+  details.method-note {
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 20px; margin: 22px 0; font-size: 0.87rem; color: #3a3a3a;
+  }
+  details.method-note summary { cursor: pointer; font-weight: 600; color: var(--ink); font-size: 0.92rem; padding: 2px 0; }
+  details.method-note[open] summary { margin-bottom: 6px; }
+  details.method-note ul { padding-left: 20px; margin: 10px 0 0; }
+  details.method-note li { margin-bottom: 8px; }
+
+  @media (max-width: 640px) {
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tbody tr { border-bottom: 1px solid var(--line); padding: 12px 14px; }
+    tbody td { border-bottom: none; padding: 4px 0; display: flex; justify-content: space-between; }
+    tbody td::before { content: attr(data-label); color: var(--muted); font-size: 0.72rem; font-weight: 500; }
+    .college { font-size: 1rem; }
+    .controls { flex-direction: column; align-items: flex-start; }
+    .header-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<noscript>
+  <div style="background:#fbeceb; border:1px solid #e2b4b0; border-radius:10px; padding:14px 18px; margin:16px; font-size:0.9rem; color:#a33a34;">
+    <strong>This page needs JavaScript to be interactive.</strong> The table below shows a fixed snapshot (score 380, conservative settings) since your browser has scripts disabled. If you're viewing this inside WhatsApp, Telegram, or another app's built-in preview, tap "Open in browser" (or save the file and open it with Chrome/Safari) to use the score box and dropdowns.
+  </div>
+</noscript>
+<div class="wrap">
+  <div class="header-row">
+    <div class="header-left">
+      <h1>Cat A &amp; Cat B — 2026 Feasibility, Refined Competing Pool</h1>
+      <p class="subtitle">23 MBBS colleges, using the real 2026 remaining-candidates pool (37,062) as the Cat B competing population &mdash; only confirmed MCC allotments removed, not merit-list-only candidates.</p>
+    </div>
+    <div class="controls">
+      <div>
+        <label for="scoreInput">Your NEET 2026 score</label>
+        <input type="number" id="scoreInput" placeholder="e.g. 380" min="0" max="720" value="380" oninput="render()">
+      </div>
+      <div>
+        <label for="seatIncreaseSelect">Seats increase</label>
+        <select id="seatIncreaseSelect" onchange="render()">
+          <option value="with">With 2026 seat increase</option>
+          <option value="without" selected>Without seat increase (worst case)</option>
+        </select>
+      </div>
+      <div>
+        <label for="minorityWomenSelect">Minority &amp; Women's colleges</label>
+        <select id="minorityWomenSelect" onchange="render()">
+          <option value="without" selected>Without (current trend)</option>
+          <option value="with">With Min &amp; Women absorption</option>
+        </select>
+      </div>
+      <div>
+        <label for="mqShiftSelect">MQ registration increase (worst case)</label>
+        <select id="mqShiftSelect" onchange="render()">
+          <option value="0">Same as 2025</option>
+          <option value="1">+1%</option>
+          <option value="2">+2%</option>
+          <option value="3">+3%</option>
+          <option value="4" selected>+4%</option>
+          <option value="5">+5%</option>
+          <option value="6">+6%</option>
+          <option value="7">+7%</option>
+          <option value="8">+8%</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr class="group">
+        <th class="college-col"></th>
+        <th class="cata" colspan="2" style="text-align:center">Cat A (Convener)</th>
+        <th class="catb" colspan="5" style="text-align:center">Cat B (Management)</th>
+      </tr>
+      <tr class="sub">
+        <th class="college-col">College</th>
+        <th class="num cata-sub">2025 closing</th>
+        <th class="num cata-sub">2026 closing</th>
+        <th class="num catb-sub">2025 closing</th>
+        <th class="num catb-sub">P1 2026 (proj.)</th>
+        <th class="num catb-sub">P2 2026 (proj.)</th>
+        <th class="num catb-sub">P3 2026 (proj.)</th>
+        <th class="catb-sub">Feasibility</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">1.</span>Apollo Institute of Medical Sciences, Hyd</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">510</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">536</td>
+        <td class="num catb-cell" data-label="2025 closing">393</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">448</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">430</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">428</span><span class="crowding-note">~10 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">2.</span>Kamineni Academy (LB Nagar), Hyd</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">483</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">510</td>
+        <td class="num catb-cell" data-label="2025 closing">388</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">430</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">425</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">424</span><span class="crowding-note">~23 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">3.</span>Mamata Academy, Bachupally, Hyd</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">485</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">504</td>
+        <td class="num catb-cell" data-label="2025 closing">383</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">427</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">421</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">420</span><span class="crowding-note">~19 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">4.</span>SVS Medical College, Mahabubnagar</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">453</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">478</td>
+        <td class="num catb-cell" data-label="2025 closing">363</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">413</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">405</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">404</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">5.</span>Bhaskar Medical College, Moinabad</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">444</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">465</td>
+        <td class="num catb-cell" data-label="2025 closing">362</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">414</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">405</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">403</span><span class="crowding-note">~11 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">6.</span>Kamineni Institute, Narketpally</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">432</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">461</td>
+        <td class="num catb-cell" data-label="2025 closing">334</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">397</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">382</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">381</span><span class="crowding-note">~8 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">7.</span>Mamata Medical College, Khammam</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">430</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">459</td>
+        <td class="num catb-cell" data-label="2025 closing">344</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">396</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="">388</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="">388</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vrisky">Very Risky</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">8.</span>Arundathi Institute of Medical Sciences, Dundigal</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">424</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">454</td>
+        <td class="num catb-cell" data-label="2025 closing">308</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">370</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">367</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">360</span><span class="crowding-note">~6 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">9.</span>Medicity Institute of Medical Sciences</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">421</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">451</td>
+        <td class="num catb-cell" data-label="2025 closing">316</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">379</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">371</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">367</span><span class="crowding-note">~5 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">10.</span>RVM Medical College, Mulugu</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">420</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">450</td>
+        <td class="num catb-cell" data-label="2025 closing">323</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">377</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">374</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">372</span><span class="crowding-note">~12 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">11.</span>Chalmeda Anand Rao Institute, Karimnagar</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">417</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">447</td>
+        <td class="num catb-cell" data-label="2025 closing">305</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="">382</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">365</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">357</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-safe">Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">12.</span>Prathima Institute, Karimnagar</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">414</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">444</td>
+        <td class="num catb-cell" data-label="2025 closing">312</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">374</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">367</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">363</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">13.</span>CMR Institute of Medical Sciences, Medchal</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">413</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">443</td>
+        <td class="num catb-cell" data-label="2025 closing">314</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">379</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">379</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">364</span><span class="crowding-note">~7 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">14.</span>Dr Patnam Mahender Reddy Institute, Chevella</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">412</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">442</td>
+        <td class="num catb-cell" data-label="2025 closing">311</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">372</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">372</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">362</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">15.</span>Prathima Relief Institute, Warangal</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">410</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">441</td>
+        <td class="num catb-cell" data-label="2025 closing">279</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">363</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">349</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">336</span><span class="crowding-note">~6 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">16.</span>Mahavir Institute, Vikarabad</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">409</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">439</td>
+        <td class="num catb-cell" data-label="2025 closing">287</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">360</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">354</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">342</span><span class="crowding-note">~12 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">17.</span>Maheshwara Medical College, Patancheru</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">410</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">438</td>
+        <td class="num catb-cell" data-label="2025 closing">302</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">365</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">361</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">354</span><span class="crowding-note">~11 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">18.</span>MNR Medical College, Sangareddy</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">411</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">438</td>
+        <td class="num catb-cell" data-label="2025 closing">295</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">366</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">356</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">349</span><span class="crowding-note">~10 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">19.</span>Surabhi Institute, Siddipet</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">404</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">435</td>
+        <td class="num catb-cell" data-label="2025 closing">266</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">353</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">344</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">324</span><span class="crowding-note">~15 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">20.</span>TRR Institute, Patancheru</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">403</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">434</td>
+        <td class="num catb-cell" data-label="2025 closing">265</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">348</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">339</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">323</span><span class="crowding-note">~9 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">21.</span>Nova Institute, Hayathnagar</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">403</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">434</td>
+        <td class="num catb-cell" data-label="2025 closing">266</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">346</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">335</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">324</span><span class="crowding-note">~17 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">22.</span>Father Colombo Institute, Warangal</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">403</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">434</td>
+        <td class="num catb-cell" data-label="2025 closing">265</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">338</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">338</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">325</span><span class="crowding-note">~7 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr>
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">23.</span>Neelima Institute of Medical Sciences, Ghatkesar</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">&mdash;</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">no data</td>
+        <td class="num catb-cell" data-label="2025 closing">276</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="phase-clear">349</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="phase-clear">347</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="phase-clear">332</span><span class="crowding-note">~7 within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict v-vsafe">Very Safe</span></td>
+      </tr></tbody>
+  </table>
+
+  <p class="summary-line" id="summaryLine">At score 380, WITHOUT seat increase (worst case): 15 Very Safe, 1 Safe, 0 Borderline, 7 Very Risky.</p>
+  <div class="legend" id="legendLine">
+      <span class="verdict v-vsafe">Very Safe</span><span class="verdict v-safe">Safe</span>
+      <span class="verdict v-border">Borderline</span>
+      <span class="verdict v-vrisky">Very Risky</span></div>
+  <p class="summary-line" style="margin-top:6px;">Phase scores your entered NEET score clears are <span class="phase-clear">highlighted</span> &mdash; the earliest highlighted phase for a college is the round you'd likely get a seat in.</p>
+  <p class="summary-line">Clearing a Phase 3 mark doesn't guarantee a seat &mdash; the small "~N within 5pts" note under each Phase 3 score shows roughly how many 2025 candidates clustered within 5 points of that college's real cutoff, so you can tell a tight margin from a crowded one.</p>
+
+  <div class="refined-note">
+    <h3>Who's counted in the 37,062 competing pool</h3>
+    <ul>
+      <li>Start: all 38,021 Telangana 2026 qualifiers.</li>
+      <li>Remove: All-India seat winners (real, published list).</li>
+      <li>Remove: candidates ruled ineligible for local quota.</li>
+      <li>Remove: AP APNL-area candidates.</li>
+      <li><strong>Not removed:</strong> Cat A (CQ) applicants &mdash; applying isn't the same as getting a seat, so they're still real Cat B competitors.</li>
+      <li>&rarr; <strong>37,062</strong> real competitors remain.</li>
+    </ul>
+  </div>
+  <div class="refined-note" style="background:#fdf6e3; border-color:#f0dca0; color:#5c4a10;">
+    <h3>Why this page opens on the conservative view</h3>
+    <ul>
+      <li>"Seats increase" defaults to <strong>Without</strong>.</li>
+      <li>The "With" scenario relies on a chain of assumptions about which candidates go where.</li>
+      <li>That chain helps top colleges (Apollo, Kamineni LB Nagar) the most, since they're earliest in the chain.</li>
+      <li>Switch to "With" only if you deliberately want the optimistic case.</li>
+      <li>For top colleges especially, treat "Without" as your real planning number.</li>
+    </ul>
+  </div>
+
+  <details class="method-note">
+    <summary>How the refined pool and both scenarios are calculated</summary>
+
+    <h3 style="margin-top:14px;">The basic idea</h3>
+    <ul>
+      <li>Colleges fill Management Quota seats in 3 rounds: Phase 1, Phase 2, Phase 3.</li>
+      <li>Phase 1 = toughest cutoff (strongest applicants only).</li>
+      <li>Phase 2 = a bit easier, only if seats remain.</li>
+      <li>Phase 3 = easiest, the last chance if seats still remain.</li>
+      <li>We don't have 2026 results yet &mdash; only 2025's &mdash; so everything below is how we estimate 2026's three marks.</li>
+    </ul>
+
+    <h3>Step 1 &mdash; who's still competing (the "37,062 pool")</h3>
+    <ul>
+      <li>Start: all 38,021 Telangana 2026 qualifiers.</li>
+      <li>Remove only <em>confirmed</em> non-competitors: All-India seat winners, and candidates ruled ineligible for local quota.</li>
+      <li>Keep Cat A (CQ) applicants in the pool &mdash; applying isn't the same as getting a seat.</li>
+      <li>Example: 100 qualify, 4 confirmed elsewhere, 2 ineligible &rarr; 94 real competitors, even if 40 of those 94 also applied for Cat A.</li>
+      <li>&rarr; Result: <strong>37,062</strong> real competitors.</li>
+    </ul>
+
+    <h3>Step 2 &mdash; turning a 2025 result into a 2026 estimate</h3>
+    <ul>
+      <li>Apollo's 2025 Phase 3 seat went to the student ranked <strong>5,533rd of 41,584</strong> (~top 13.3%).</li>
+      <li>We don't reuse rank 5,533 directly &mdash; this year's real pool (37,062) is a different size.</li>
+      <li>Instead: find who sits at that <em>same top-13.3%</em> mark within the 37,062 pool, and read their real 2026 score.</li>
+      <li>&rarr; For Apollo, this gives Phase 1/2/3 = <strong>445 / 428 / 427</strong>.</li>
+    </ul>
+
+    <h3>"Without seat increase" (conservative, default view)</h3>
+    <ul>
+      <li>Just Step 2, with no further adjustment.</li>
+      <li>Answers: "if 2026 repeats 2025's pattern on this year's real pool, what marks are needed?"</li>
+      <li>Treat this as the safer number to plan around.</li>
+    </ul>
+
+    <h3>"With seat increase" (optimistic view) &mdash; two layers on top of Step 2</h3>
+    <ul>
+      <li><strong>Layer A &mdash; this college's own seat growth.</strong> Apollo's seats grew 44&rarr;45 (just 1 seat) &mdash; barely moves anything, about 48 rank-positions of easing.</li>
+      <li><strong>Layer B &mdash; the government college "domino effect."</strong> 4 government colleges added ~41 new seats this year.</li>
+      <li>Some students who'd have taken a paid Management Quota seat instead get one of these new government seats &mdash; one fewer real competitor for private colleges.</li>
+      <li>Traced through, this reaches Apollo specifically, adding up to <strong>1,747</strong> rank-positions of easing (before the loyalty dampening below reduces it) &mdash; far bigger than Apollo's own seat growth.</li>
+      <li>&rarr; Apollo "With" (after dampening) = <strong>436 / 421 / 420</strong>, still below "Without" (445/428/427), but less optimistic than an undampened cascade would suggest.</li>
+      <li><strong>Honest caveat:</strong> this domino chain is the most speculative part of the model &mdash; it assumes displaced students pick "the next best option" in a predictable order, which we can't independently verify. Colored badges on each college show how confident we are; "high confidence" means "most defensible link in the chain," not "certain."</li>
+    </ul>
+
+    <h3>Loyalty/"sticky demand" dampening (top Hyderabad colleges)</h3>
+    <ul>
+      <li>Checked real 2025 data: of Apollo's actual Cat B joiners, how many could have gotten <em>some</em> Cat A seat statewide but paid for Apollo's Cat B anyway?</li>
+      <li>&rarr; <strong>59% of Apollo's joiners</strong> had a Cat A alternative and skipped it &mdash; real brand/location loyalty, not settling.</li>
+      <li>Checked the same for every other college: Kamineni LB Nagar 9%, Mamata Bachupally 11%, <strong>all other 20 colleges: 0%</strong> (their joiners had no real alternative at all).</li>
+      <li>Students who are loyal to a specific college wouldn't actually leave even if more government seats opened up &mdash; so the domino effect above only gets applied to the non-loyal share of each college's demand.</li>
+      <li>Apollo's domino relief is scaled to 41% of what it would otherwise be (100% &minus; 59%); Kamineni LB Nagar to 91%; Mamata Bachupally to 89%; all other colleges are unaffected (their 0% loyalty means no scaling at all).</li>
+    </ul>
+
+    <h3>Minority &amp; Women's colleges dropdown</h3>
+    <ul>
+      <li>4 colleges (Shadan, Ayaan, Deccan, Dr. VRK Women's) only admit minority/women students via Management Quota &mdash; never real competitors for our 23 target colleges.</li>
+      <li>2025 actual: 114 students joined those 4 colleges.</li>
+      <li>Shadan got a big real seat increase (150&rarr;250) for 2026 &mdash; modeled individually, not as one flat rate for all 4.</li>
+      <li>&rarr; Estimated 2026 capacity: <strong>194</strong> students (up from 114).</li>
+      <li>Turning "With" on removes a data-based share of these students from each college's pool, based on real overlap with that college's own historical range.</li>
+      <li>A college with no historical overlap (like Apollo) sees zero change.</li>
+    </ul>
+
+    <h3>MQ registration increase dropdown (stress test)</h3>
+    <ul>
+      <li>Not based on observed data &mdash; a dial you control yourself.</li>
+      <li>Tests: "what if more students register for MQ this year than in 2025?"</li>
+      <li>More applicants for the same seats &rarr; cutoffs can only go up or stay flat, never down.</li>
+      <li>"Same as 2025" = no adjustment.</li>
+    </ul>
+
+    <h3>Clearing a cutoff isn't a guarantee &mdash; the "~N within 5pts" note</h3>
+    <ul>
+      <li>A closing mark is just the <em>weakest student who actually got in</em> in 2025 &mdash; not a promise for anyone scoring the same or better.</li>
+      <li>Whether you actually get the seat also depends on: how many others at or above your score also want that specific college that round, and tie-breaking among students who share your exact score.</li>
+      <li>Using each college's real 2025 admission pattern, we estimated how many students typically clustered within 5 points of the final cutoff.</li>
+      <li>A <strong>low</strong> number (e.g. Medicity, ~5) means a fairly clean margin &mdash; clearing the mark is fairly decisive.</li>
+      <li>A <strong>high</strong> number (e.g. Kamineni LB Nagar, ~23) means many students bunch right at that score &mdash; clearing the historical mark is closer to a toss-up than a guarantee.</li>
+    </ul>
+
+    <h3>Putting it together &mdash; the feasibility rating</h3>
+    <ul>
+      <li><strong>Very Safe</strong> &mdash; clears even Phase 1 (toughest).</li>
+      <li><strong>Safe</strong> &mdash; clears Phase 2, maybe not Phase 1.</li>
+      <li><strong>Borderline</strong> &mdash; only the final Phase 3 round would take you.</li>
+      <li><strong>Very Risky</strong> &mdash; even Phase 3's mark is currently out of reach.</li>
+    </ul>
+
+    <h3>Other notes</h3>
+    <ul>
+      <li>Excludes: Deccan, Shadan, Ayaan (minority-quota-only), Dr VRK Women's Medical College, both Malla Reddy colleges (no MQ record found), all dental (BDS) colleges.</li>
+      <li>Neelima Institute has no Cat A college-wise record in the source data, so no Cat A columns are shown for it.</li>
+      <li>Cat A rows exclude PWD/disability, NCC, Armed-Forces-children, and Sports-quota entries from the open-merit calculation.</li>
+    </ul>
+  </details>
+</div>
+
+<script>
+const colleges = [
+  {
+    "name": "Apollo Institute of Medical Sciences, Hyd",
+    "code": "APLO",
+    "seats2025": 44,
+    "seats2026": 45,
+    "opening_sno": 1457,
+    "closing_sno": 5533,
+    "segments": [
+      {
+        "snoLo": 1457,
+        "snoHi": 2475,
+        "joined": 9,
+        "reg": 47,
+        "scoreLo": 467,
+        "scoreHi": 494,
+        "qualified2026": 1019
+      },
+      {
+        "snoLo": 2476,
+        "snoHi": 3495,
+        "joined": 6,
+        "reg": 44,
+        "scoreLo": 450,
+        "scoreHi": 467,
+        "qualified2026": 1020
+      },
+      {
+        "snoLo": 3496,
+        "snoHi": 4514,
+        "joined": 8,
+        "reg": 59,
+        "scoreLo": 436,
+        "scoreHi": 450,
+        "qualified2026": 1019
+      },
+      {
+        "snoLo": 4515,
+        "snoHi": 5533,
+        "joined": 21,
+        "reg": 112,
+        "scoreLo": 425,
+        "scoreHi": 436,
+        "qualified2026": 1019
+      }
+    ],
+    "catB_p1_sno": 3930,
+    "catB_p2_sno": 5429,
+    "catB_p3_sno": 5533,
+    "catB_2025_closing_real": 393,
+    "catA": {
+      "seats2025": 28,
+      "seatsIncreased": 0,
+      "openingScore": 598,
+      "closingScore2025": 510,
+      "closingScore2026": 536
+    },
+    "minorityExtension": 0.0,
+    "stickyFraction": 0.591,
+    "crowdingNear5pt": 10
+  },
+  {
+    "name": "Kamineni Academy (LB Nagar), Hyd",
+    "code": "KMHD",
+    "seats2025": 43,
+    "seats2026": 45,
+    "opening_sno": 2766,
+    "closing_sno": 5935,
+    "segments": [
+      {
+        "snoLo": 2766,
+        "snoHi": 3557,
+        "joined": 2,
+        "reg": 35,
+        "scoreLo": 449,
+        "scoreHi": 462,
+        "qualified2026": 792
+      },
+      {
+        "snoLo": 3558,
+        "snoHi": 4350,
+        "joined": 1,
+        "reg": 46,
+        "scoreLo": 439,
+        "scoreHi": 449,
+        "qualified2026": 793
+      },
+      {
+        "snoLo": 4351,
+        "snoHi": 5143,
+        "joined": 8,
+        "reg": 74,
+        "scoreLo": 428,
+        "scoreHi": 439,
+        "qualified2026": 793
+      },
+      {
+        "snoLo": 5144,
+        "snoHi": 5935,
+        "joined": 32,
+        "reg": 104,
+        "scoreLo": 421,
+        "scoreHi": 428,
+        "qualified2026": 792
+      }
+    ],
+    "catB_p1_sno": 5365,
+    "catB_p2_sno": 5885,
+    "catB_p3_sno": 5935,
+    "catB_2025_closing_real": 388,
+    "catA": {
+      "seats2025": 29,
+      "seatsIncreased": 0,
+      "openingScore": 543,
+      "closingScore2025": 483,
+      "closingScore2026": 510
+    },
+    "minorityExtension": 18.6,
+    "stickyFraction": 0.093,
+    "crowdingNear5pt": 23
+  },
+  {
+    "name": "Mamata Academy, Bachupally, Hyd",
+    "code": "MAMS",
+    "seats2025": 44,
+    "seats2026": 60,
+    "opening_sno": 4310,
+    "closing_sno": 6376,
+    "segments": [
+      {
+        "snoLo": 4310,
+        "snoHi": 4826,
+        "joined": 7,
+        "reg": 45,
+        "scoreLo": 433,
+        "scoreHi": 439,
+        "qualified2026": 517
+      },
+      {
+        "snoLo": 4827,
+        "snoHi": 5343,
+        "joined": 5,
+        "reg": 57,
+        "scoreLo": 426,
+        "scoreHi": 432,
+        "qualified2026": 517
+      },
+      {
+        "snoLo": 5344,
+        "snoHi": 5859,
+        "joined": 13,
+        "reg": 69,
+        "scoreLo": 421,
+        "scoreHi": 426,
+        "qualified2026": 516
+      },
+      {
+        "snoLo": 5860,
+        "snoHi": 6376,
+        "joined": 19,
+        "reg": 64,
+        "scoreLo": 416,
+        "scoreHi": 421,
+        "qualified2026": 517
+      }
+    ],
+    "catB_p1_sno": 5553,
+    "catB_p2_sno": 6265,
+    "catB_p3_sno": 6376,
+    "catB_2025_closing_real": 383,
+    "catA": {
+      "seats2025": 23,
+      "seatsIncreased": 50,
+      "openingScore": 542,
+      "closingScore2025": 485,
+      "closingScore2026": 504
+    },
+    "minorityExtension": 97.0,
+    "stickyFraction": 0.114,
+    "crowdingNear5pt": 19
+  },
+  {
+    "name": "SVS Medical College, Mahabubnagar",
+    "code": "SVSM",
+    "seats2025": 44,
+    "seats2026": 60,
+    "opening_sno": 5246,
+    "closing_sno": 8386,
+    "segments": [
+      {
+        "snoLo": 5246,
+        "snoHi": 6030,
+        "joined": 8,
+        "reg": 104,
+        "scoreLo": 420,
+        "scoreHi": 427,
+        "qualified2026": 785
+      },
+      {
+        "snoLo": 6031,
+        "snoHi": 6815,
+        "joined": 14,
+        "reg": 90,
+        "scoreLo": 412,
+        "scoreHi": 420,
+        "qualified2026": 785
+      },
+      {
+        "snoLo": 6816,
+        "snoHi": 7601,
+        "joined": 10,
+        "reg": 92,
+        "scoreLo": 405,
+        "scoreHi": 412,
+        "qualified2026": 786
+      },
+      {
+        "snoLo": 7602,
+        "snoHi": 8386,
+        "joined": 12,
+        "reg": 104,
+        "scoreLo": 398,
+        "scoreHi": 405,
+        "qualified2026": 785
+      }
+    ],
+    "catB_p1_sno": 7253,
+    "catB_p2_sno": 8179,
+    "catB_p3_sno": 8386,
+    "catB_2025_closing_real": 363,
+    "catA": {
+      "seats2025": 31,
+      "seatsIncreased": 50,
+      "openingScore": 514,
+      "closingScore2025": 453,
+      "closingScore2026": 478
+    },
+    "minorityExtension": 455.6,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "Bhaskar Medical College, Moinabad",
+    "code": "BASK",
+    "seats2025": 44,
+    "seats2026": 60,
+    "opening_sno": 5791,
+    "closing_sno": 8431,
+    "segments": [
+      {
+        "snoLo": 5791,
+        "snoHi": 6450,
+        "joined": 10,
+        "reg": 79,
+        "scoreLo": 415,
+        "scoreHi": 422,
+        "qualified2026": 660
+      },
+      {
+        "snoLo": 6451,
+        "snoHi": 7111,
+        "joined": 13,
+        "reg": 70,
+        "scoreLo": 409,
+        "scoreHi": 415,
+        "qualified2026": 661
+      },
+      {
+        "snoLo": 7112,
+        "snoHi": 7771,
+        "joined": 8,
+        "reg": 90,
+        "scoreLo": 404,
+        "scoreHi": 409,
+        "qualified2026": 660
+      },
+      {
+        "snoLo": 7772,
+        "snoHi": 8431,
+        "joined": 13,
+        "reg": 88,
+        "scoreLo": 398,
+        "scoreHi": 404,
+        "qualified2026": 660
+      }
+    ],
+    "catB_p1_sno": 7057,
+    "catB_p2_sno": 8193,
+    "catB_p3_sno": 8431,
+    "catB_2025_closing_real": 362,
+    "catA": {
+      "seats2025": 33,
+      "seatsIncreased": 50,
+      "openingScore": 516,
+      "closingScore2025": 444,
+      "closingScore2026": 465
+    },
+    "minorityExtension": 403.0,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 11
+  },
+  {
+    "name": "Kamineni Institute, Narketpally",
+    "code": "KMNI",
+    "seats2025": 59,
+    "seats2026": 60,
+    "opening_sno": 4806,
+    "closing_sno": 11509,
+    "segments": [
+      {
+        "snoLo": 4806,
+        "snoHi": 6481,
+        "joined": 2,
+        "reg": 202,
+        "scoreLo": 415,
+        "scoreHi": 433,
+        "qualified2026": 1676
+      },
+      {
+        "snoLo": 6482,
+        "snoHi": 8157,
+        "joined": 15,
+        "reg": 215,
+        "scoreLo": 400,
+        "scoreHi": 415,
+        "qualified2026": 1676
+      },
+      {
+        "snoLo": 8158,
+        "snoHi": 9833,
+        "joined": 22,
+        "reg": 206,
+        "scoreLo": 386,
+        "scoreHi": 400,
+        "qualified2026": 1676
+      },
+      {
+        "snoLo": 9834,
+        "snoHi": 11509,
+        "joined": 20,
+        "reg": 223,
+        "scoreLo": 373,
+        "scoreHi": 386,
+        "qualified2026": 1676
+      }
+    ],
+    "catB_p1_sno": 9287,
+    "catB_p2_sno": 11347,
+    "catB_p3_sno": 11509,
+    "catB_2025_closing_real": 334,
+    "catA": {
+      "seats2025": 39,
+      "seatsIncreased": 0,
+      "openingScore": 505,
+      "closingScore2025": 432,
+      "closingScore2026": 461
+    },
+    "minorityExtension": 906.8,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 8
+  },
+  {
+    "name": "Mamata Medical College, Khammam",
+    "code": "MMTA",
+    "seats2025": 59,
+    "seats2026": 60,
+    "opening_sno": 5069,
+    "closing_sno": 10443,
+    "segments": [
+      {
+        "snoLo": 5069,
+        "snoHi": 6412,
+        "joined": 5,
+        "reg": 168,
+        "scoreLo": 416,
+        "scoreHi": 430,
+        "qualified2026": 1344
+      },
+      {
+        "snoLo": 6413,
+        "snoHi": 7755,
+        "joined": 14,
+        "reg": 160,
+        "scoreLo": 404,
+        "scoreHi": 416,
+        "qualified2026": 1343
+      },
+      {
+        "snoLo": 7756,
+        "snoHi": 9099,
+        "joined": 21,
+        "reg": 173,
+        "scoreLo": 392,
+        "scoreHi": 404,
+        "qualified2026": 1344
+      },
+      {
+        "snoLo": 9100,
+        "snoHi": 10443,
+        "joined": 19,
+        "reg": 174,
+        "scoreLo": 381,
+        "scoreHi": 392,
+        "qualified2026": 1344
+      }
+    ],
+    "catB_p1_sno": 9466,
+    "catB_p2_sno": 10443,
+    "catB_p3_sno": 10443,
+    "catB_2025_closing_real": 344,
+    "catA": {
+      "seats2025": 41,
+      "seatsIncreased": 0,
+      "openingScore": 550,
+      "closingScore2025": 430,
+      "closingScore2026": 459
+    },
+    "minorityExtension": 741.8,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "Arundathi Institute of Medical Sciences, Dundigal",
+    "code": "AIMD",
+    "seats2025": 44,
+    "seats2026": 45,
+    "opening_sno": 6377,
+    "closing_sno": 14527,
+    "segments": [
+      {
+        "snoLo": 6377,
+        "snoHi": 8414,
+        "joined": 8,
+        "reg": 251,
+        "scoreLo": 398,
+        "scoreHi": 416,
+        "qualified2026": 2038
+      },
+      {
+        "snoLo": 8415,
+        "snoHi": 10451,
+        "joined": 9,
+        "reg": 264,
+        "scoreLo": 381,
+        "scoreHi": 398,
+        "qualified2026": 2037
+      },
+      {
+        "snoLo": 10452,
+        "snoHi": 12489,
+        "joined": 8,
+        "reg": 277,
+        "scoreLo": 365,
+        "scoreHi": 381,
+        "qualified2026": 2038
+      },
+      {
+        "snoLo": 12490,
+        "snoHi": 14527,
+        "joined": 19,
+        "reg": 280,
+        "scoreLo": 350,
+        "scoreHi": 365,
+        "qualified2026": 2038
+      }
+    ],
+    "catB_p1_sno": 13053,
+    "catB_p2_sno": 13447,
+    "catB_p3_sno": 14527,
+    "catB_2025_closing_real": 308,
+    "catA": {
+      "seats2025": 20,
+      "seatsIncreased": 0,
+      "openingScore": 498,
+      "closingScore2025": 424,
+      "closingScore2026": 454
+    },
+    "minorityExtension": 885.0,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 6
+  },
+  {
+    "name": "Medicity Institute of Medical Sciences",
+    "code": "MEDI",
+    "seats2025": 42,
+    "seats2026": 45,
+    "opening_sno": 5530,
+    "closing_sno": 13537,
+    "segments": [
+      {
+        "snoLo": 5530,
+        "snoHi": 7531,
+        "joined": 1,
+        "reg": 243,
+        "scoreLo": 406,
+        "scoreHi": 425,
+        "qualified2026": 2002
+      },
+      {
+        "snoLo": 7532,
+        "snoHi": 9533,
+        "joined": 9,
+        "reg": 262,
+        "scoreLo": 388,
+        "scoreHi": 406,
+        "qualified2026": 2002
+      },
+      {
+        "snoLo": 9534,
+        "snoHi": 11535,
+        "joined": 16,
+        "reg": 261,
+        "scoreLo": 372,
+        "scoreHi": 388,
+        "qualified2026": 2002
+      },
+      {
+        "snoLo": 11536,
+        "snoHi": 13537,
+        "joined": 16,
+        "reg": 275,
+        "scoreLo": 357,
+        "scoreHi": 372,
+        "qualified2026": 2002
+      }
+    ],
+    "catB_p1_sno": 11888,
+    "catB_p2_sno": 12936,
+    "catB_p3_sno": 13537,
+    "catB_2025_closing_real": 316,
+    "catA": {
+      "seats2025": 25,
+      "seatsIncreased": 0,
+      "openingScore": 500,
+      "closingScore2025": 421,
+      "closingScore2026": 451
+    },
+    "minorityExtension": 981.6,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 5
+  },
+  {
+    "name": "RVM Medical College, Mulugu",
+    "code": "RVMC",
+    "seats2025": 74,
+    "seats2026": 74,
+    "opening_sno": 5770,
+    "closing_sno": 12800,
+    "segments": [
+      {
+        "snoLo": 5770,
+        "snoHi": 7527,
+        "joined": 10,
+        "reg": 207,
+        "scoreLo": 406,
+        "scoreHi": 422,
+        "qualified2026": 1758
+      },
+      {
+        "snoLo": 7528,
+        "snoHi": 9285,
+        "joined": 14,
+        "reg": 232,
+        "scoreLo": 390,
+        "scoreHi": 406,
+        "qualified2026": 1758
+      },
+      {
+        "snoLo": 9286,
+        "snoHi": 11042,
+        "joined": 18,
+        "reg": 231,
+        "scoreLo": 376,
+        "scoreHi": 390,
+        "qualified2026": 1757
+      },
+      {
+        "snoLo": 11043,
+        "snoHi": 12800,
+        "joined": 32,
+        "reg": 238,
+        "scoreLo": 363,
+        "scoreHi": 376,
+        "qualified2026": 1758
+      }
+    ],
+    "catB_p1_sno": 12053,
+    "catB_p2_sno": 12508,
+    "catB_p3_sno": 12800,
+    "catB_2025_closing_real": 323,
+    "catA": {
+      "seats2025": 44,
+      "seatsIncreased": 0,
+      "openingScore": 508,
+      "closingScore2025": 420,
+      "closingScore2026": 450
+    },
+    "minorityExtension": 755.9,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 12
+  },
+  {
+    "name": "Chalmeda Anand Rao Institute, Karimnagar",
+    "code": "CARK",
+    "seats2025": 59,
+    "seats2026": 60,
+    "opening_sno": 6229,
+    "closing_sno": 14895,
+    "segments": [
+      {
+        "snoLo": 6229,
+        "snoHi": 8395,
+        "joined": 10,
+        "reg": 265,
+        "scoreLo": 398,
+        "scoreHi": 417,
+        "qualified2026": 2167
+      },
+      {
+        "snoLo": 8396,
+        "snoHi": 10561,
+        "joined": 7,
+        "reg": 283,
+        "scoreLo": 380,
+        "scoreHi": 398,
+        "qualified2026": 2166
+      },
+      {
+        "snoLo": 10562,
+        "snoHi": 12728,
+        "joined": 13,
+        "reg": 295,
+        "scoreLo": 364,
+        "scoreHi": 380,
+        "qualified2026": 2167
+      },
+      {
+        "snoLo": 12729,
+        "snoHi": 14895,
+        "joined": 29,
+        "reg": 294,
+        "scoreLo": 347,
+        "scoreHi": 364,
+        "qualified2026": 2167
+      }
+    ],
+    "catB_p1_sno": 11454,
+    "catB_p2_sno": 13794,
+    "catB_p3_sno": 14895,
+    "catB_2025_closing_real": 305,
+    "catA": {
+      "seats2025": 43,
+      "seatsIncreased": 0,
+      "openingScore": 533,
+      "closingScore2025": 417,
+      "closingScore2026": 447
+    },
+    "minorityExtension": 826.7,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "Prathima Institute, Karimnagar",
+    "code": "PRTM",
+    "seats2025": 74,
+    "seats2026": 74,
+    "opening_sno": 6058,
+    "closing_sno": 14090,
+    "segments": [
+      {
+        "snoLo": 6058,
+        "snoHi": 8065,
+        "joined": 10,
+        "reg": 246,
+        "scoreLo": 401,
+        "scoreHi": 419,
+        "qualified2026": 2008
+      },
+      {
+        "snoLo": 8066,
+        "snoHi": 10073,
+        "joined": 11,
+        "reg": 252,
+        "scoreLo": 384,
+        "scoreHi": 401,
+        "qualified2026": 2008
+      },
+      {
+        "snoLo": 10074,
+        "snoHi": 12082,
+        "joined": 25,
+        "reg": 276,
+        "scoreLo": 368,
+        "scoreHi": 384,
+        "qualified2026": 2009
+      },
+      {
+        "snoLo": 12083,
+        "snoHi": 14090,
+        "joined": 28,
+        "reg": 275,
+        "scoreLo": 353,
+        "scoreHi": 368,
+        "qualified2026": 2008
+      }
+    ],
+    "catB_p1_sno": 12518,
+    "catB_p2_sno": 13435,
+    "catB_p3_sno": 14090,
+    "catB_2025_closing_real": 312,
+    "catA": {
+      "seats2025": 40,
+      "seatsIncreased": 0,
+      "openingScore": 468,
+      "closingScore2025": 414,
+      "closingScore2026": 444
+    },
+    "minorityExtension": 995.2,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "CMR Institute of Medical Sciences, Medchal",
+    "code": "CMRM",
+    "seats2025": 73,
+    "seats2026": 74,
+    "opening_sno": 5793,
+    "closing_sno": 13905,
+    "segments": [
+      {
+        "snoLo": 5793,
+        "snoHi": 7820,
+        "joined": 7,
+        "reg": 244,
+        "scoreLo": 403,
+        "scoreHi": 422,
+        "qualified2026": 2028
+      },
+      {
+        "snoLo": 7821,
+        "snoHi": 9849,
+        "joined": 15,
+        "reg": 257,
+        "scoreLo": 386,
+        "scoreHi": 403,
+        "qualified2026": 2029
+      },
+      {
+        "snoLo": 9850,
+        "snoHi": 11877,
+        "joined": 30,
+        "reg": 276,
+        "scoreLo": 370,
+        "scoreHi": 386,
+        "qualified2026": 2028
+      },
+      {
+        "snoLo": 11878,
+        "snoHi": 13905,
+        "joined": 21,
+        "reg": 272,
+        "scoreLo": 354,
+        "scoreHi": 370,
+        "qualified2026": 2028
+      }
+    ],
+    "catB_p1_sno": 11755,
+    "catB_p2_sno": 11755,
+    "catB_p3_sno": 13905,
+    "catB_2025_closing_real": 314,
+    "catA": {
+      "seats2025": 47,
+      "seatsIncreased": 0,
+      "openingScore": 500,
+      "closingScore2025": 413,
+      "closingScore2026": 443
+    },
+    "minorityExtension": 1315.0,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 7
+  },
+  {
+    "name": "Dr Patnam Mahender Reddy Institute, Chevella",
+    "code": "DPMR",
+    "seats2025": 59,
+    "seats2026": 60,
+    "opening_sno": 7094,
+    "closing_sno": 14216,
+    "segments": [
+      {
+        "snoLo": 7094,
+        "snoHi": 8874,
+        "joined": 4,
+        "reg": 239,
+        "scoreLo": 394,
+        "scoreHi": 409,
+        "qualified2026": 1781
+      },
+      {
+        "snoLo": 8875,
+        "snoHi": 10655,
+        "joined": 12,
+        "reg": 228,
+        "scoreLo": 379,
+        "scoreHi": 394,
+        "qualified2026": 1781
+      },
+      {
+        "snoLo": 10656,
+        "snoHi": 12435,
+        "joined": 19,
+        "reg": 242,
+        "scoreLo": 366,
+        "scoreHi": 379,
+        "qualified2026": 1780
+      },
+      {
+        "snoLo": 12436,
+        "snoHi": 14216,
+        "joined": 24,
+        "reg": 246,
+        "scoreLo": 352,
+        "scoreHi": 366,
+        "qualified2026": 1781
+      }
+    ],
+    "catB_p1_sno": 12770,
+    "catB_p2_sno": 12770,
+    "catB_p3_sno": 14216,
+    "catB_2025_closing_real": 311,
+    "catA": {
+      "seats2025": 33,
+      "seatsIncreased": 0,
+      "openingScore": 467,
+      "closingScore2025": 412,
+      "closingScore2026": 442
+    },
+    "minorityExtension": 821.0,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "Prathima Relief Institute, Warangal",
+    "code": "PRIW",
+    "seats2025": 44,
+    "seats2026": 45,
+    "opening_sno": 6766,
+    "closing_sno": 18113,
+    "segments": [
+      {
+        "snoLo": 6766,
+        "snoHi": 9602,
+        "joined": 2,
+        "reg": 362,
+        "scoreLo": 388,
+        "scoreHi": 412,
+        "qualified2026": 2837
+      },
+      {
+        "snoLo": 9603,
+        "snoHi": 12439,
+        "joined": 2,
+        "reg": 380,
+        "scoreLo": 366,
+        "scoreHi": 388,
+        "qualified2026": 2837
+      },
+      {
+        "snoLo": 12440,
+        "snoHi": 15276,
+        "joined": 15,
+        "reg": 388,
+        "scoreLo": 344,
+        "scoreHi": 366,
+        "qualified2026": 2837
+      },
+      {
+        "snoLo": 15277,
+        "snoHi": 18113,
+        "joined": 25,
+        "reg": 383,
+        "scoreLo": 323,
+        "scoreHi": 344,
+        "qualified2026": 2837
+      }
+    ],
+    "catB_p1_sno": 14274,
+    "catB_p2_sno": 16351,
+    "catB_p3_sno": 18113,
+    "catB_2025_closing_real": 279,
+    "catA": {
+      "seats2025": 12,
+      "seatsIncreased": 0,
+      "openingScore": 474,
+      "closingScore2025": 410,
+      "closingScore2026": 441
+    },
+    "minorityExtension": 936.3,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 6
+  },
+  {
+    "name": "Mahavir Institute, Vikarabad",
+    "code": "MHVR",
+    "seats2025": 58,
+    "seats2026": 60,
+    "opening_sno": 8507,
+    "closing_sno": 17175,
+    "segments": [
+      {
+        "snoLo": 8507,
+        "snoHi": 10673,
+        "joined": 1,
+        "reg": 278,
+        "scoreLo": 379,
+        "scoreHi": 397,
+        "qualified2026": 2167
+      },
+      {
+        "snoLo": 10674,
+        "snoHi": 12841,
+        "joined": 0,
+        "reg": 295,
+        "scoreLo": 363,
+        "scoreHi": 379,
+        "qualified2026": 2168
+      },
+      {
+        "snoLo": 12842,
+        "snoHi": 15008,
+        "joined": 17,
+        "reg": 298,
+        "scoreLo": 346,
+        "scoreHi": 363,
+        "qualified2026": 2167
+      },
+      {
+        "snoLo": 15009,
+        "snoHi": 17175,
+        "joined": 40,
+        "reg": 296,
+        "scoreLo": 330,
+        "scoreHi": 346,
+        "qualified2026": 2167
+      }
+    ],
+    "catB_p1_sno": 14551,
+    "catB_p2_sno": 15360,
+    "catB_p3_sno": 17175,
+    "catB_2025_closing_real": 287,
+    "catA": {
+      "seats2025": 20,
+      "seatsIncreased": 0,
+      "openingScore": 460,
+      "closingScore2025": 409,
+      "closingScore2026": 439
+    },
+    "minorityExtension": 589.2,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 12
+  },
+  {
+    "name": "Maheshwara Medical College, Patancheru",
+    "code": "MAHE",
+    "seats2025": 44,
+    "seats2026": 74,
+    "opening_sno": 8250,
+    "closing_sno": 15309,
+    "segments": [
+      {
+        "snoLo": 8250,
+        "snoHi": 10014,
+        "joined": 4,
+        "reg": 222,
+        "scoreLo": 385,
+        "scoreHi": 399,
+        "qualified2026": 1765
+      },
+      {
+        "snoLo": 10015,
+        "snoHi": 11779,
+        "joined": 2,
+        "reg": 234,
+        "scoreLo": 370,
+        "scoreHi": 385,
+        "qualified2026": 1765
+      },
+      {
+        "snoLo": 11780,
+        "snoHi": 13544,
+        "joined": 9,
+        "reg": 239,
+        "scoreLo": 357,
+        "scoreHi": 370,
+        "qualified2026": 1765
+      },
+      {
+        "snoLo": 13545,
+        "snoHi": 15309,
+        "joined": 29,
+        "reg": 247,
+        "scoreLo": 344,
+        "scoreHi": 357,
+        "qualified2026": 1765
+      }
+    ],
+    "catB_p1_sno": 13810,
+    "catB_p2_sno": 14415,
+    "catB_p3_sno": 15309,
+    "catB_2025_closing_real": 302,
+    "catA": {
+      "seats2025": 15,
+      "seatsIncreased": 100,
+      "openingScore": 461,
+      "closingScore2025": 410,
+      "closingScore2026": 438
+    },
+    "minorityExtension": 502.2,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 11
+  },
+  {
+    "name": "MNR Medical College, Sangareddy",
+    "code": "MNRS",
+    "seats2025": 44,
+    "seats2026": 74,
+    "opening_sno": 8081,
+    "closing_sno": 16108,
+    "segments": [
+      {
+        "snoLo": 8081,
+        "snoHi": 10087,
+        "joined": 2,
+        "reg": 252,
+        "scoreLo": 384,
+        "scoreHi": 401,
+        "qualified2026": 2007
+      },
+      {
+        "snoLo": 10088,
+        "snoHi": 12094,
+        "joined": 3,
+        "reg": 275,
+        "scoreLo": 368,
+        "scoreHi": 384,
+        "qualified2026": 2007
+      },
+      {
+        "snoLo": 12095,
+        "snoHi": 14101,
+        "joined": 8,
+        "reg": 274,
+        "scoreLo": 353,
+        "scoreHi": 368,
+        "qualified2026": 2007
+      },
+      {
+        "snoLo": 14102,
+        "snoHi": 16108,
+        "joined": 31,
+        "reg": 280,
+        "scoreLo": 338,
+        "scoreHi": 353,
+        "qualified2026": 2007
+      }
+    ],
+    "catB_p1_sno": 13688,
+    "catB_p2_sno": 15106,
+    "catB_p3_sno": 16108,
+    "catB_2025_closing_real": 295,
+    "catA": {
+      "seats2025": 17,
+      "seatsIncreased": 100,
+      "openingScore": 457,
+      "closingScore2025": 411,
+      "closingScore2026": 438
+    },
+    "minorityExtension": 534.2,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 10
+  },
+  {
+    "name": "Surabhi Institute, Siddipet",
+    "code": "SURB",
+    "seats2025": 59,
+    "seats2026": 60,
+    "opening_sno": 14107,
+    "closing_sno": 19764,
+    "segments": [
+      {
+        "snoLo": 14107,
+        "snoHi": 15521,
+        "joined": 9,
+        "reg": 194,
+        "scoreLo": 342,
+        "scoreHi": 353,
+        "qualified2026": 1415
+      },
+      {
+        "snoLo": 15522,
+        "snoHi": 16935,
+        "joined": 7,
+        "reg": 190,
+        "scoreLo": 332,
+        "scoreHi": 342,
+        "qualified2026": 1414
+      },
+      {
+        "snoLo": 16936,
+        "snoHi": 18349,
+        "joined": 13,
+        "reg": 194,
+        "scoreLo": 322,
+        "scoreHi": 332,
+        "qualified2026": 1414
+      },
+      {
+        "snoLo": 18350,
+        "snoHi": 19764,
+        "joined": 30,
+        "reg": 176,
+        "scoreLo": 312,
+        "scoreHi": 322,
+        "qualified2026": 1415
+      }
+    ],
+    "catB_p1_sno": 15487,
+    "catB_p2_sno": 16818,
+    "catB_p3_sno": 19764,
+    "catB_2025_closing_real": 266,
+    "catA": {
+      "seats2025": 22,
+      "seatsIncreased": 0,
+      "openingScore": 442,
+      "closingScore2025": 404,
+      "closingScore2026": 435
+    },
+    "minorityExtension": 362.6,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 15
+  },
+  {
+    "name": "TRR Institute, Patancheru",
+    "code": "TRRM",
+    "seats2025": 44,
+    "seats2026": 45,
+    "opening_sno": 15384,
+    "closing_sno": 19918,
+    "segments": [
+      {
+        "snoLo": 15384,
+        "snoHi": 16517,
+        "joined": 6,
+        "reg": 164,
+        "scoreLo": 335,
+        "scoreHi": 343,
+        "qualified2026": 1134
+      },
+      {
+        "snoLo": 16518,
+        "snoHi": 17651,
+        "joined": 7,
+        "reg": 141,
+        "scoreLo": 327,
+        "scoreHi": 335,
+        "qualified2026": 1134
+      },
+      {
+        "snoLo": 17652,
+        "snoHi": 18784,
+        "joined": 14,
+        "reg": 148,
+        "scoreLo": 319,
+        "scoreHi": 327,
+        "qualified2026": 1133
+      },
+      {
+        "snoLo": 18785,
+        "snoHi": 19918,
+        "joined": 17,
+        "reg": 151,
+        "scoreLo": 310,
+        "scoreHi": 319,
+        "qualified2026": 1134
+      }
+    ],
+    "catB_p1_sno": 16125,
+    "catB_p2_sno": 17415,
+    "catB_p3_sno": 19918,
+    "catB_2025_closing_real": 265,
+    "catA": {
+      "seats2025": 12,
+      "seatsIncreased": 0,
+      "openingScore": 443,
+      "closingScore2025": 403,
+      "closingScore2026": 434
+    },
+    "minorityExtension": 364.3,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 9
+  },
+  {
+    "name": "Nova Institute, Hayathnagar",
+    "code": "NOVA",
+    "seats2025": 74,
+    "seats2026": 74,
+    "opening_sno": 14552,
+    "closing_sno": 19823,
+    "segments": [
+      {
+        "snoLo": 14552,
+        "snoHi": 15869,
+        "joined": 5,
+        "reg": 185,
+        "scoreLo": 340,
+        "scoreHi": 350,
+        "qualified2026": 1318
+      },
+      {
+        "snoLo": 15870,
+        "snoHi": 17187,
+        "joined": 13,
+        "reg": 177,
+        "scoreLo": 330,
+        "scoreHi": 340,
+        "qualified2026": 1318
+      },
+      {
+        "snoLo": 17188,
+        "snoHi": 18505,
+        "joined": 25,
+        "reg": 168,
+        "scoreLo": 320,
+        "scoreHi": 330,
+        "qualified2026": 1318
+      },
+      {
+        "snoLo": 18506,
+        "snoHi": 19823,
+        "joined": 31,
+        "reg": 174,
+        "scoreLo": 311,
+        "scoreHi": 320,
+        "qualified2026": 1318
+      }
+    ],
+    "catB_p1_sno": 16427,
+    "catB_p2_sno": 18057,
+    "catB_p3_sno": 19823,
+    "catB_2025_closing_real": 266,
+    "catA": {
+      "seats2025": 31,
+      "seatsIncreased": 0,
+      "openingScore": 450,
+      "closingScore2025": 403,
+      "closingScore2026": 434
+    },
+    "minorityExtension": 404.6,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 17
+  },
+  {
+    "name": "Father Colombo Institute, Warangal",
+    "code": "FCIM",
+    "seats2025": 43,
+    "seats2026": 45,
+    "opening_sno": 6658,
+    "closing_sno": 19872,
+    "segments": [
+      {
+        "snoLo": 6658,
+        "snoHi": 9961,
+        "joined": 2,
+        "reg": 424,
+        "scoreLo": 385,
+        "scoreHi": 413,
+        "qualified2026": 3304
+      },
+      {
+        "snoLo": 9962,
+        "snoHi": 13265,
+        "joined": 2,
+        "reg": 445,
+        "scoreLo": 359,
+        "scoreHi": 385,
+        "qualified2026": 3304
+      },
+      {
+        "snoLo": 13266,
+        "snoHi": 16568,
+        "joined": 5,
+        "reg": 465,
+        "scoreLo": 335,
+        "scoreHi": 359,
+        "qualified2026": 3303
+      },
+      {
+        "snoLo": 16569,
+        "snoHi": 19872,
+        "joined": 34,
+        "reg": 425,
+        "scoreLo": 311,
+        "scoreHi": 335,
+        "qualified2026": 3304
+      }
+    ],
+    "catB_p1_sno": 18008,
+    "catB_p2_sno": 18008,
+    "catB_p3_sno": 19872,
+    "catB_2025_closing_real": 265,
+    "catA": {
+      "seats2025": 32,
+      "seatsIncreased": 0,
+      "openingScore": 462,
+      "closingScore2025": 403,
+      "closingScore2026": 434
+    },
+    "minorityExtension": 614.6,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 7
+  },
+  {
+    "name": "Neelima Institute of Medical Sciences, Ghatkesar",
+    "code": "NIMG",
+    "seats2025": 50,
+    "seats2026": 60,
+    "opening_sno": 11964,
+    "closing_sno": 18481,
+    "segments": [
+      {
+        "snoLo": 11964,
+        "snoHi": 13593,
+        "joined": 3,
+        "reg": 215,
+        "scoreLo": 357,
+        "scoreHi": 369,
+        "qualified2026": 1630
+      },
+      {
+        "snoLo": 13594,
+        "snoHi": 15222,
+        "joined": 9,
+        "reg": 228,
+        "scoreLo": 345,
+        "scoreHi": 357,
+        "qualified2026": 1629
+      },
+      {
+        "snoLo": 15223,
+        "snoHi": 16851,
+        "joined": 22,
+        "reg": 228,
+        "scoreLo": 332,
+        "scoreHi": 345,
+        "qualified2026": 1629
+      },
+      {
+        "snoLo": 16852,
+        "snoHi": 18481,
+        "joined": 16,
+        "reg": 213,
+        "scoreLo": 321,
+        "scoreHi": 332,
+        "qualified2026": 1630
+      }
+    ],
+    "catB_p1_sno": 16101,
+    "catB_p2_sno": 16371,
+    "catB_p3_sno": 18481,
+    "catB_2025_closing_real": 276,
+    "minorityExtension": 955.2,
+    "stickyFraction": 0.0,
+    "crowdingNear5pt": 7
+  }
+];
+const remainingBreakpoints = [[1, 675], [2, 641], [3, 635], [4, 633], [7, 632], [8, 630], [10, 628], [12, 624], [14, 622], [15, 621], [16, 620], [21, 619], [23, 618], [24, 617], [25, 616], [26, 615], [28, 614], [30, 611], [32, 610], [35, 609], [36, 608], [37, 607], [39, 606], [42, 605], [44, 604], [46, 602], [49, 601], [53, 600], [54, 599], [55, 598], [58, 597], [62, 596], [63, 595], [70, 594], [73, 593], [78, 592], [79, 590], [81, 589], [83, 588], [85, 587], [88, 586], [89, 585], [95, 584], [99, 583], [103, 582], [105, 581], [110, 580], [116, 579], [119, 578], [125, 577], [126, 576], [129, 575], [134, 574], [140, 573], [143, 572], [149, 571], [154, 570], [157, 569], [160, 568], [165, 567], [167, 566], [173, 565], [184, 564], [194, 563], [204, 562], [211, 561], [218, 560], [227, 559], [233, 558], [234, 557], [240, 556], [248, 555], [256, 554], [263, 553], [268, 552], [273, 551], [283, 550], [289, 549], [297, 548], [303, 547], [306, 546], [313, 545], [322, 544], [330, 543], [341, 542], [354, 541], [363, 540], [375, 539], [379, 538], [395, 537], [403, 536], [419, 535], [430, 534], [435, 533], [448, 532], [455, 531], [464, 530], [477, 529], [497, 528], [512, 527], [522, 526], [540, 525], [552, 524], [565, 523], [580, 522], [594, 521], [612, 520], [631, 519], [642, 518], [651, 517], [665, 516], [691, 515], [710, 514], [727, 513], [742, 512], [766, 511], [782, 510], [806, 509], [820, 508], [846, 507], [864, 506], [890, 505], [915, 504], [944, 503], [969, 502], [989, 501], [1021, 500], [1055, 499], [1081, 498], [1102, 497], [1133, 496], [1154, 495], [1184, 494], [1218, 493], [1243, 492], [1272, 491], [1296, 490], [1329, 489], [1357, 488], [1393, 487], [1427, 486], [1454, 485], [1493, 484], [1521, 483], [1552, 482], [1584, 481], [1614, 480], [1655, 479], [1683, 478], [1721, 477], [1760, 476], [1793, 475], [1843, 474], [1885, 473], [1934, 472], [1977, 471], [2022, 470], [2069, 469], [2123, 468], [2163, 467], [2220, 466], [2278, 465], [2330, 464], [2387, 463], [2437, 462], [2493, 461], [2558, 460], [2622, 459], [2675, 458], [2731, 457], [2791, 456], [2851, 455], [2913, 454], [2980, 453], [3040, 452], [3100, 451], [3159, 450], [3232, 449], [3291, 448], [3364, 447], [3440, 446], [3496, 445], [3562, 444], [3636, 443], [3710, 442], [3792, 441], [3861, 440], [3944, 439], [4019, 438], [4084, 437], [4161, 436], [4240, 435], [4325, 434], [4409, 433], [4480, 432], [4558, 431], [4642, 430], [4728, 429], [4786, 428], [4872, 427], [4952, 426], [5065, 425], [5174, 424], [5281, 423], [5392, 422], [5475, 421], [5580, 420], [5681, 419], [5764, 418], [5855, 417], [5951, 416], [6065, 415], [6163, 414], [6266, 413], [6377, 412], [6471, 411], [6575, 410], [6704, 409], [6814, 408], [6915, 407], [7023, 406], [7144, 405], [7256, 404], [7372, 403], [7481, 402], [7606, 401], [7696, 400], [7809, 399], [7923, 398], [8023, 397], [8126, 396], [8252, 395], [8361, 394], [8474, 393], [8595, 392], [8715, 391], [8837, 390], [8958, 389], [9070, 388], [9190, 387], [9301, 386], [9447, 385], [9568, 384], [9685, 383], [9801, 382], [9932, 381], [10046, 380], [10186, 379], [10316, 378], [10451, 377], [10567, 376], [10679, 375], [10805, 374], [10938, 373], [11055, 372], [11182, 371], [11295, 370], [11446, 369], [11571, 368], [11687, 367], [11817, 366], [11966, 365], [12102, 364], [12235, 363], [12355, 362], [12472, 361], [12606, 360], [12724, 359], [12840, 358], [12952, 357], [13103, 356], [13228, 355], [13377, 354], [13519, 353], [13642, 352], [13763, 351], [13886, 350], [14036, 349], [14177, 348], [14304, 347], [14433, 346], [14555, 345], [14706, 344], [14819, 343], [14938, 342], [15072, 341], [15202, 340], [15349, 339], [15474, 338], [15584, 337], [15718, 336], [15847, 335], [15989, 334], [16115, 333], [16238, 332], [16367, 331], [16487, 330], [16649, 329], [16787, 328], [16932, 327], [17065, 326], [17214, 325], [17353, 324], [17483, 323], [17606, 322], [17747, 321], [17875, 320], [18035, 319], [18174, 318], [18321, 317], [18445, 316], [18578, 315], [18734, 314], [18873, 313], [18998, 312], [19109, 311], [19243, 310], [19408, 309], [19554, 308], [19697, 307], [19833, 306], [19966, 305], [20128, 304], [20281, 303], [20410, 302], [20528, 301], [20651, 300], [20796, 299], [20933, 298], [21080, 297], [21217, 296], [21346, 295], [21507, 294], [21645, 293], [21765, 292], [21896, 291], [22032, 290], [22217, 289], [22358, 288], [22502, 287], [22642, 286], [22772, 285], [22902, 284], [23030, 283], [23158, 282], [23299, 281], [23444, 280], [23604, 279], [23741, 278], [23860, 277], [23977, 276], [24120, 275], [24260, 274], [24412, 273], [24541, 272], [24689, 271], [24840, 270], [25001, 269], [25126, 268], [25230, 267], [25353, 266], [25483, 265], [25663, 264], [25816, 263], [25951, 262], [26100, 261], [26234, 260], [26407, 259], [26555, 258], [26691, 257], [26812, 256], [26959, 255], [27131, 254], [27252, 253], [27379, 252], [27508, 251], [27624, 250], [27787, 249], [27924, 248], [28073, 247], [28198, 246], [28332, 245], [28492, 244], [28626, 243], [28767, 242], [28915, 241], [29076, 240], [29243, 239], [29396, 238], [29529, 237], [29669, 236], [29815, 235], [29977, 234], [30121, 233], [30245, 232], [30383, 231], [30515, 230], [30682, 229], [30843, 228], [30972, 227], [31113, 226], [31251, 225], [31402, 224], [31545, 223], [31688, 222], [31827, 221], [31976, 220], [32146, 219], [32294, 218], [32432, 217], [32576, 216], [32727, 215], [32918, 214], [33074, 213], [33225, 212], [33331, 211], [33426, 210], [33547, 209], [33663, 208], [33784, 207], [33897, 206], [33986, 205], [34108, 204], [34189, 203], [34297, 202], [34391, 201], [34493, 200], [34636, 199], [34723, 198], [34822, 197], [34918, 196], [35016, 195], [35151, 194], [35261, 193], [35373, 192], [35448, 191], [35545, 190], [35657, 189], [35773, 188], [35882, 187], [35986, 186], [36097, 185], [36220, 184], [36329, 183], [36426, 182], [36520, 181], [36612, 180], [36742, 179], [36857, 178], [36956, 177]];
+const N_REMAINING = 37062;
+const N_2025 = 41584;
+const APOLLO_GOVT_CASCADE_SNO = 1747;
+
+function scoreAtPercentileRemaining(sno2025) {
+  const pct = sno2025 / N_2025;
+  let pos = Math.round(pct * N_REMAINING);
+  pos = Math.max(1, Math.min(pos, N_REMAINING));
+  let lo = 0, hi = remainingBreakpoints.length - 1, ans = 0;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (remainingBreakpoints[mid][0] <= pos) { ans = mid; lo = mid + 1; }
+    else { hi = mid - 1; }
+  }
+  return remainingBreakpoints[ans][1];
+}
+
+function fmtPct(n) { return (n * 100).toFixed(2) + "%"; }
+
+function localDensity(c) {
+  const lastSeg = c.segments[c.segments.length - 1];
+  const segWidth = lastSeg.snoHi - lastSeg.snoLo + 1;
+  return segWidth > 0 ? lastSeg.joined / segWidth : 0;
+}
+
+function growthSno(c, applyGrowth, applyMinorityWomen, mqShift) {
+  const minorityExt = applyMinorityWomen ? (c.minorityExtension || 0) : 0;
+  // More MQ registration -> more competition for the same seats -> the college
+  // can be pickier within its own historical window -> closing rank moves
+  // BETTER (compresses toward opening), proportional to the window's own width.
+  // Applied regardless of the seat-growth toggle, since it reflects registration
+  // behavior, not seat capacity.
+  const windowWidth = c.closing_sno - c.opening_sno;
+  const mqShiftSno = -(windowWidth * (mqShift || 0) / 100);
+  const baseSno = c.closing_sno + minorityExt + mqShiftSno;
+  if (!applyGrowth) return baseSno;
+  const newSeats = c.seats2026 - c.seats2025;
+  const lastSeg = c.segments[c.segments.length - 1];
+  const segWidth = lastSeg.snoHi - lastSeg.snoLo + 1;
+  const joinRate = lastSeg.joined / segWidth;
+  const extraNeeded = joinRate > 0 ? newSeats / joinRate : 0;
+  return baseSno + extraNeeded;
+}
+
+function candidatesAboveThresholdRefined(segments, thresholdScore) {
+  let total = 0;
+  for (const s of segments) {
+    const loScore = scoreAtPercentileRemaining(s.snoHi);
+    const hiScore = scoreAtPercentileRemaining(s.snoLo);
+    const joined = s.joined;
+    if (loScore >= thresholdScore) total += joined;
+    else if (hiScore > thresholdScore) {
+      const frac = hiScore > loScore ? (hiScore - thresholdScore) / (hiScore - loScore) : 0;
+      total += joined * Math.max(0, frac);
+    }
+  }
+  return total;
+}
+
+function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift) {
+  // Cascade ORDER (who displaces whom) is fixed at the baseline (no MQ shift) -
+  // it reflects structural college preference, not a hypothetical scenario. Only
+  // the MAGNITUDE of each step changes with mqShift, not the sequence itself.
+  // (Learned this the hard way with an earlier dropdown - letting the sort order
+  // itself shift with the scenario produced non-monotonic ripples for individual
+  // colleges even though each college's own calculation was correct in isolation.)
+  const orderBasis = colleges.map(c => {
+    const gSno0 = growthSno(c, applyGrowth, applyMinorityWomen, 0);
+    return { c, gScore0: scoreAtPercentileRemaining(Math.round(gSno0)) };
+  });
+  orderBasis.sort((a, b) => b.gScore0 - a.gScore0);
+  const orderedColleges = orderBasis.map(w => w.c);
+
+  const withGrowth = orderedColleges.map(c => {
+    const gSno = growthSno(c, applyGrowth, applyMinorityWomen, mqShift);
+    return { c, gSno, gScore: scoreAtPercentileRemaining(Math.round(gSno)) };
+  });
+
+  const result = {};
+  if (!applyGrowth) {
+    withGrowth.forEach(w => { result[w.c.name] = { sno: w.gSno, hop: null, confidence: "none" }; });
+    return result;
+  }
+
+  const apollo = withGrowth[0];
+  // Sticky-demand dampening: real 2025 data shows a meaningful share of a
+  // college's own Cat B joiners could have gotten SOME Cat A seat statewide
+  // but chose that college's Cat B anyway (brand/location loyalty). Only the
+  // non-sticky share would realistically be pulled away by more Cat A seats
+  // becoming available, so the cascade's effect on each college is scaled by
+  // (1 - stickyFraction). Verified against real data: Apollo 59% sticky,
+  // Kamineni LB Nagar 9%, Mamata Bachupally 11%, all other 20 colleges 0%
+  // (their Cat B joiners have no real Cat A alternative at all).
+  const apolloDampened = APOLLO_GOVT_CASCADE_SNO * (1 - (apollo.c.stickyFraction || 0));
+  const apolloCascadeSno = apollo.gSno + apolloDampened;
+  result[apollo.c.name] = { sno: apolloCascadeSno, hop: 0, confidence: "high" };
+
+  let currentThreshold = scoreAtPercentileRemaining(Math.round(apolloCascadeSno));
+  let hop = 1;
+  for (let i = 1; i < withGrowth.length; i++) {
+    const { c, gSno } = withGrowth[i];
+    const ceiling = scoreAtPercentileRemaining(c.opening_sno);
+    if (ceiling > currentThreshold) {
+      const displacedRaw = candidatesAboveThresholdRefined(c.segments, currentThreshold);
+      const displaced = Math.round(displacedRaw * (1 - (c.stickyFraction || 0)));
+      const density = localDensity(c);
+      const extension = density > 0 ? displaced / density : 0;
+      const newSno = gSno + extension;
+      result[c.name] = { sno: newSno, hop, confidence: hop === 1 ? "medium" : (hop <= 3 ? "low" : "verylow") };
+      currentThreshold = scoreAtPercentileRemaining(Math.round(newSno));
+      hop++;
+    } else {
+      result[c.name] = { sno: gSno, hop: null, confidence: "none" };
+    }
+  }
+  return result;
+}
+
+function computeCollege(c, applyGrowth, cascade) {
+  const cc = cascade[c.name];
+  const totalExtension = cc.sno - c.closing_sno;
+  const p1Score = scoreAtPercentileRemaining(Math.round(c.catB_p1_sno + totalExtension));
+  const p2Score = scoreAtPercentileRemaining(Math.round(c.catB_p2_sno + totalExtension));
+  const p3Score = scoreAtPercentileRemaining(Math.round(cc.sno));
+  return { ...c, p1Score, p2Score, p3Score, cascadeHop: cc.hop, cascadeConfidence: cc.confidence };
+}
+
+function feasibility(score, c) {
+  if (score == null || isNaN(score)) return ["&mdash;", "v-neutral"];
+  if (score >= c.p1Score) return ["Very Safe", "v-vsafe"];
+  if (score >= c.p2Score) return ["Safe", "v-safe"];
+  if (score >= c.p3Score) return ["Borderline", "v-border"];
+  return ["Very Risky", "v-vrisky"];
+}
+
+function cascadeBadge(hop, confidence) {
+  if (hop === null) return "";
+  const labels = { high: "Govt cascade", medium: "Cascade (medium)", low: "Cascade (low)", verylow: "Cascade (illustrative)" };
+  const cls = { high: "badge-high", medium: "badge-medium", low: "badge-low", verylow: "badge-verylow" };
+  return `<span class="relief-badge ${cls[confidence]}">${labels[confidence]}</span>`;
+}
+
+function render() {
+  const scoreVal = document.getElementById("scoreInput").value;
+  const userScore = scoreVal === "" ? null : parseFloat(scoreVal);
+  const applyGrowth = document.getElementById("seatIncreaseSelect").value === "with";
+  const applyMinorityWomen = document.getElementById("minorityWomenSelect").value === "with";
+  const mqShift = parseFloat(document.getElementById("mqShiftSelect").value);
+
+  const cascade = computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift);
+  const computed = colleges.map(c => computeCollege(c, applyGrowth, cascade));
+
+  const displayOrder = [...computed].sort((a, b) => {
+    const av = a.catA ? a.catA.closingScore2026 : -1;
+    const bv = b.catA ? b.catA.closingScore2026 : -1;
+    return bv - av;
+  });
+
+  const tbody = document.getElementById("tableBody");
+  tbody.innerHTML = displayOrder.map((c, i) => {
+    const [label, cls] = feasibility(userScore, c);
+    let catA2025, catA2026;
+    if (c.catA) {
+      catA2025 = `${c.catA.closingScore2025}`;
+      catA2026 = `${c.catA.closingScore2026}`;
+    } else {
+      catA2025 = "&mdash;"; catA2026 = "no data";
+    }
+    const clearsP1 = userScore != null && !isNaN(userScore) && userScore >= c.p1Score;
+    const clearsP2 = userScore != null && !isNaN(userScore) && userScore >= c.p2Score;
+    const clearsP3 = userScore != null && !isNaN(userScore) && userScore >= c.p3Score;
+    return `
+      <tr>
+        <td class="college" data-label="College"><span class="rank-num">${i+1}.</span>${c.name}${cascadeBadge(c.cascadeHop, c.cascadeConfidence)}</td>
+        <td class="num cata-cell" data-label="Cat A 2025 closing">${catA2025}</td>
+        <td class="num cata-cell" data-label="Cat A 2026 closing">${catA2026}</td>
+        <td class="num catb-cell" data-label="2025 closing">${c.catB_2025_closing_real != null ? c.catB_2025_closing_real : "&mdash;"}</td>
+        <td class="num catb-cell" data-label="P1 2026 (proj.)"><span class="${clearsP1 ? 'phase-clear' : ''}">${c.p1Score}</span></td>
+        <td class="num catb-cell" data-label="P2 2026 (proj.)"><span class="${clearsP2 ? 'phase-clear' : ''}">${c.p2Score}</span></td>
+        <td class="num catb-cell" data-label="P3 2026 (proj.)"><span class="${clearsP3 ? 'phase-clear' : ''}">${c.p3Score}</span><span class="crowding-note">~${c.crowdingNear5pt} within 5pts</span></td>
+        <td data-label="Feasibility"><span class="verdict ${cls}">${label}</span></td>
+      </tr>`;
+  }).join("");
+
+  let summary;
+  if (userScore == null || isNaN(userScore)) {
+    summary = `Enter your NEET 2026 score above to see a feasibility rating for each of these ${colleges.length} colleges.`;
+    document.getElementById("legendLine").innerHTML = "";
+  } else {
+    const counts = { "Very Safe":0, "Safe":0, "Borderline":0, "Very Risky":0 };
+    computed.forEach(c => { counts[feasibility(userScore, c)[0]]++; });
+    const scenario = applyGrowth ? "with 2026 seat increase" : "WITHOUT seat increase (worst case)";
+    summary = `At score ${userScore}, ${scenario}: ${counts["Very Safe"]} Very Safe, ${counts["Safe"]} Safe, ${counts["Borderline"]} Borderline, ${counts["Very Risky"]} Very Risky.`;
+    document.getElementById("legendLine").innerHTML = `
+      <span class="verdict v-vsafe">Very Safe</span><span class="verdict v-safe">Safe</span>
+      <span class="verdict v-border">Borderline</span>
+      <span class="verdict v-vrisky">Very Risky</span>`;
+  }
+  document.getElementById("summaryLine").textContent = summary;
+}
+
+document.getElementById("seatIncreaseSelect").addEventListener("change", render);
+document.getElementById("minorityWomenSelect").addEventListener("change", render);
+document.getElementById("mqShiftSelect").addEventListener("change", render);
+document.getElementById("scoreInput").addEventListener("input", render);
+render();
+</script>
+</body>
+</html>
