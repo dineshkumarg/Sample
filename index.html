@@ -152,10 +152,13 @@
         </select>
       </div>
       <div>
-        <label for="minorityWomenSelect">Minority &amp; Women's colleges</label>
+        <label for="minorityWomenSelect">Min &amp; Women colleges sliding</label>
         <select id="minorityWomenSelect" onchange="render()">
-          <option value="without" selected>Without (current trend)</option>
-          <option value="with">With Min &amp; Women absorption</option>
+          <option value="0" selected>Without (current trend)</option>
+          <option value="0.25">25% slide</option>
+          <option value="0.5">50% slide</option>
+          <option value="0.75">75% slide</option>
+          <option value="1">100% slide</option>
         </select>
       </div>
       <div>
@@ -529,14 +532,15 @@
       <li>Apollo's domino relief is scaled to 41% of what it would otherwise be (100% &minus; 59%); Kamineni LB Nagar to 91%; Mamata Bachupally to 89%; all other colleges are unaffected (their 0% loyalty means no scaling at all).</li>
     </ul>
 
-    <h3>Minority &amp; Women's colleges dropdown</h3>
+    <h3>Min &amp; Women colleges sliding dropdown</h3>
     <ul>
       <li>4 colleges (Shadan, Ayaan, Deccan, Dr. VRK Women's) only admit minority/women students via Management Quota &mdash; never real competitors for our 23 target colleges.</li>
       <li>2025 actual: 114 students joined those 4 colleges.</li>
       <li>Shadan got a big real seat increase (150&rarr;250) for 2026 &mdash; modeled individually, not as one flat rate for all 4.</li>
       <li>&rarr; Estimated 2026 capacity: <strong>194</strong> students (up from 114).</li>
-      <li>Turning "With" on removes a data-based share of these students from each college's pool, based on real overlap with that college's own historical range.</li>
-      <li>A college with no historical overlap (like Apollo) sees zero change.</li>
+      <li>Choosing a slide level (20/50/75/100%) removes that fraction of the data-based estimate from each college's pool, based on real overlap with that college's own historical range.</li>
+      <li>"Without" (0%, the default) applies none of this; 100% applies the full estimate.</li>
+      <li>A college with no historical overlap (like Apollo) sees zero change at any slide level.</li>
     </ul>
 
     <h3>MQ registration increase dropdown (stress test)</h3>
@@ -1975,8 +1979,8 @@ function localDensity(c) {
   return segWidth > 0 ? lastSeg.joined / segWidth : 0;
 }
 
-function growthSno(c, applyGrowth, applyMinorityWomen, mqShift) {
-  const minorityExt = applyMinorityWomen ? (c.minorityExtension || 0) : 0;
+function growthSno(c, applyGrowth, minorityWomenSlide, mqShift) {
+  const minorityExt = (c.minorityExtension || 0) * (minorityWomenSlide || 0);
   // More MQ registration -> more competition for the same seats -> the college
   // can be pickier within its own historical window -> closing rank moves
   // BETTER (compresses toward opening), proportional to the window's own width.
@@ -2009,7 +2013,7 @@ function candidatesAboveThresholdRefined(segments, thresholdScore) {
   return total;
 }
 
-function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIntensity) {
+function computeCascadeChain(applyGrowth, minorityWomenSlide, mqShift, cascadeIntensity) {
   // Cascade ORDER (who displaces whom) is fixed at the baseline (no MQ shift) -
   // it reflects structural college preference, not a hypothetical scenario. Only
   // the MAGNITUDE of each step changes with mqShift, not the sequence itself.
@@ -2017,7 +2021,7 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIn
   // itself shift with the scenario produced non-monotonic ripples for individual
   // colleges even though each college's own calculation was correct in isolation.)
   const orderBasis = colleges.map(c => {
-    const gSno0 = growthSno(c, applyGrowth, applyMinorityWomen, 0);
+    const gSno0 = growthSno(c, applyGrowth, minorityWomenSlide, 0);
     return { c, gScore0: scoreAtPercentileRemaining(Math.round(gSno0)) };
   });
   orderBasis.sort((a, b) => b.gScore0 - a.gScore0);
@@ -2028,7 +2032,7 @@ function computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIn
   // cascadeIntensity below. Only Layer B (the government cascade / domino
   // effect, added afterward) responds to this dropdown.
   const withGrowth = orderedColleges.map(c => {
-    const gSno = growthSno(c, applyGrowth, applyMinorityWomen, mqShift);
+    const gSno = growthSno(c, applyGrowth, minorityWomenSlide, mqShift);
     return { c, gSno, gScore: scoreAtPercentileRemaining(Math.round(gSno)) };
   });
 
@@ -2103,11 +2107,11 @@ function render() {
   const scoreVal = document.getElementById("scoreInput").value;
   const userScore = scoreVal === "" ? null : parseFloat(scoreVal);
   const applyGrowth = document.getElementById("seatIncreaseSelect").value === "with";
-  const applyMinorityWomen = document.getElementById("minorityWomenSelect").value === "with";
+  const minorityWomenSlide = parseFloat(document.getElementById("minorityWomenSelect").value);
   const mqShift = parseFloat(document.getElementById("mqShiftSelect").value);
   const cascadeIntensity = parseFloat(document.getElementById("cascadeIntensitySelect").value);
 
-  const cascade = computeCascadeChain(applyGrowth, applyMinorityWomen, mqShift, cascadeIntensity);
+  const cascade = computeCascadeChain(applyGrowth, minorityWomenSlide, mqShift, cascadeIntensity);
   const computed = colleges.map(c => computeCollege(c, applyGrowth, cascade));
 
   const displayOrder = [...computed].sort((a, b) => {
